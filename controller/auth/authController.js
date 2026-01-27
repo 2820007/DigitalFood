@@ -1,7 +1,8 @@
 const User=require("../../model/userModel")
 const bcrypt=require("bcryptjs")
 
-const jwt=require("jsonwebtoken")
+const jwt=require("jsonwebtoken");
+const sendEmail = require("../../services/sendEmail");
 
 
 
@@ -81,5 +82,50 @@ exports.userLogin= async(req,res)=>{
             message:"invalid password"
         })
     }
+
+}
+
+
+
+//forget password
+
+
+exports.forgetPassword=async(req,res)=>{
+    const {email}=req.body
+    if(!email){
+        return res.status(400).json({
+            message:"Please provide an email"
+        })
+    }
+
+    //check the user with  that email
+    const existUser= await User.find({userEmail:email})
+
+    if(existUser.length ==0){
+        return res.status(404).json({
+            message:"User with that email is not registered"
+        })
+    }
+
+
+    //generate otp
+
+    const otp=Math.floor(1000+ Math.random()*9000)
+
+       existUser[0].otp=otp
+       await existUser[0].save()
+
+    await sendEmail({
+        email:email,
+        subject:"Otp for digitalFood forgetPassword",
+        message:`Your otp is${otp}. Donot share with any one`
+    })
+    res.status(200).json({
+        message:"Email sent successfully"
+    })
+
+
+
+
 
 }
