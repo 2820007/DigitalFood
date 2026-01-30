@@ -28,9 +28,16 @@ role:{
 },
 otp:{
     type:Number,
+},
+isOtpVerified:{
+    type:Boolean,
+    default:false
 }
 
 
+},
+{
+    timestamps:true
 })
 
 

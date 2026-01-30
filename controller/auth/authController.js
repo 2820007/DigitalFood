@@ -124,8 +124,80 @@ exports.forgetPassword=async(req,res)=>{
         message:"Email sent successfully"
     })
 
+}
 
 
+//Verify Otp
 
+exports.verifyOtp= async(req,res)=>{
+    const {email,otp}=req.body
+    if(!email || !otp){
+        return res.status(400).json({
+            message:"Please provide email,otp"
+        })
+    }
+
+    //check if that  otp is correct  or not fo that email
+
+    const userExists=await User.find({userEmail:email})
+    if(userExists.length ==0){
+        return res.status(404).json({
+            message:"Email is not registered"
+        })
+    }
+
+    if(userExists[0].otp !== otp){
+        res.status(400).json({
+            message:"Invalid"
+        })
+    }
+    else{
+        //dispose the otp so cannot be used next time the same otp
+        userExists[0].otp=undefined
+        userExists[0].isOtpVerified =true
+        await userExists[0].save()
+        res.status(200).json({
+            message:"Otp is correct"
+        })
+
+    }
+}
+
+
+exports.resetPassword=async(req,res)=>{
+    const {email,newPassword,confirmPassword}=req.body;
+    if(!email || !newPassword || !confirmPassword){
+        return res.status(400).json({
+            message:"Please provide email, newPassword and confirmPassword"
+        })
+    }
+
+    if(newPassword !== confirmPassword){
+        return res.status(400).json({
+            message:"newPassword and confirmPassword is not match"
+        })
+    }
+
+    const userExists=await User.find({userEmail:email})
+
+    if(userExists.length ==0){
+        return res.status(400).json({
+            message:"User email not registered"
+        })
+    }
+    if(userExists[0].isOtpVerified !== true){
+        return res.status(403).json({
+            message:"You cannot perform this action"
+        })
+    }
+
+
+    userExists[0].userPassword=bcrypt.hashSync(newPassword,10)
+    userExists[0].isOtpVerified=false
+    await userExists[0].save()
+
+    res.status(200).json({
+        message:"Password changed successfully.."
+    })
 
 }
