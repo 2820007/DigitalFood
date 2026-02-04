@@ -22,7 +22,8 @@ const productSchema=new Schema({
         type:String,
         enum:["available","unavailable"],
         default:"available"
-    }
+    },
+    productImage:String,
 
 },
 {
