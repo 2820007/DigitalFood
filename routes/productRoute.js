@@ -1,16 +1,32 @@
-const { createProduct, getProducts, getProduct } = require("../controller/admin/product/productController")
-const isAuthenticated = require("../middleware/isAuthenticateMidddleware")
-const permitTo = require("../middleware/permitTo")
+const {
+  createProduct,
+  getProducts,
+  getProduct,
+  deleteProduct,
+  editProduct,
+} = require("../controller/admin/product/productController");
+const isAuthenticated = require("../middleware/isAuthenticateMidddleware");
+const permitTo = require("../middleware/permitTo");
 
-const router=require("express").Router()
+const router = require("express").Router();
 
+const { multer, storage } = require("../middleware/multerConfig");
+const catchAsync = require("../services/catchAsync");
+const upload = multer({ storage: storage });
 
-const {multer,storage}=require("../middleware/multerConfig")
-const catchAsync = require("../services/catchAsync")
-const upload=multer({storage:storage})
+router
+  .route("/products")
+  .post(
+    isAuthenticated,
+    permitTo("admin"),
+    upload.single("productImage"),
+    catchAsync(createProduct),
+  )
+  .get(catchAsync(getProducts));
+router
+  .route("/product/:id")
+  .get(catchAsync(getProduct))
+  .delete(isAuthenticated, permitTo("admin"), catchAsync(deleteProduct))
+  .patch(isAuthenticated,permitTo("admin"),upload.single("productImage"),catchAsync(editProduct))
 
-router.route("/products").post(isAuthenticated,permitTo("admin"),upload.single("productImage") ,catchAsync(createProduct))
-.get(catchAsync(getProducts))
-router.route("/product/:id").get(catchAsync(getProduct))
-
-module.exports=router
+module.exports = router;
