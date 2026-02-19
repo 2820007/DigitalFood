@@ -1,4 +1,5 @@
 const mongoose=require("mongoose")
+const { reviewSchema } = require("./NewReviewModel")
 
 const Schema=mongoose.Schema
 const productSchema=new Schema({
@@ -24,6 +25,7 @@ const productSchema=new Schema({
         default:"available"
     },
     productImage:String,
+    reviews:[reviewSchema]
 
 },
 {

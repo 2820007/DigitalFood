@@ -2,6 +2,8 @@ const express=require("express")
 const { connectDb } = require("./database/database")
 const authRoute=require("./routes/authRoute")
 const productRoute=require("./routes/productRoute")
+const adminUserRoute=require("./routes/adminUserRoute")
+const reviewRoute=require("./routes/reviewRoute")
 const app=express()
 
 require("dotenv").config()
@@ -22,6 +24,8 @@ connectDb()
 
 app.use("/api",authRoute)
 app.use("/api",productRoute)
+app.use("/api",adminUserRoute)
+app.use("/api",reviewRoute)
 
 
 app.get("/",(req,res)=>{

@@ -7,83 +7,82 @@ const sendEmail = require("../../services/sendEmail");
 
 
 exports.userRegister=async(req,res)=>{
-    const {email,password,phoneNumber,username}=req.body;
-    if(!email || !password || !phoneNumber || !username)
-    {
-        return res.status(400).json({
-            message:"Please provide email,password,phoneNumber and username"
-        })
-    }
 
 
-    //check if that email user already register or not
 
-    const userFound=await User.find({userEmail:email})
-    if(userFound.length>0){
-        return res.status(400).json({
-            message:"User with that email already register"
-        })
-    }
+  const { userEmail, userPassword, userPhoneNumber, userName } = req.body;
 
+  // Validation
+  if (!userEmail || !userPassword || !userPhoneNumber || !userName) {
+    return res.status(400).json({
+      message: "Please provide email, password, phoneNumber and username",
+    });
+  }
 
-    await User.create({
-        userName:username,
-        userPhoneNumber:phoneNumber,
-        userEmail:email,
-        userPassword:bcrypt.hashSync(password,10)
-    })
+  // Check if email already exists
+  const userFound = await User.findOne({ userEmail });
 
+  if (userFound) {
+    return res.status(400).json({
+      message: "User with that email already registered",
+    });
+  }
 
-    res.status(201).json({
-        message:"User Register Successfully...."
-    })
+  // Hash password
+  const hashedPassword = bcrypt.hashSync(String(userPassword), 10);
+
+  // Create user
+  await User.create({
+    userName,
+    userPhoneNumber,
+    userEmail,
+    userPassword: hashedPassword,
+  });
+
+  return res.status(201).json({
+    message: "User Registered Successfully",
+  });
 }
 
 
 
-exports.userLogin= async(req,res)=>{
-    const {email,password}=req.body;
+exports.userLogin = async (req, res) => {
+  const { userEmail, userPassword } = req.body;
 
-    if(!email || !password){
-        return res.status(400).json({
-            message:"Please provide email and password"
-        })
-    }
+  if (!userEmail || !userPassword) {
+    return res.status(400).json({
+      message: "Please provide email and password",
+    });
+  }
 
-    //check if that email user already exists or not
+  // Use findOne instead of find
+  const userFound = await User.findOne({ userEmail });
 
-    const userFound=await User.find({userEmail:email})
-    if(userFound === 0){
-        return res.status(404).json({
-            message:"User with email is not register"
-        })
-    }
+  if (!userFound) {
+    return res.status(404).json({
+      message: "User with email is not registered",
+    });
+  }
 
+  // Compare password safely
+  const isMatched = bcrypt.compareSync(userPassword, userFound.userPassword);
 
-    //password check
+  if (!isMatched) {
+    return res.status(400).json({
+      message: "Invalid password",
+    });
+  }
 
-    const isMatched=bcrypt.compareSync(password,userFound[0].userPassword)
+  const token = jwt.sign({ id: userFound._id }, process.env.SECRET_KEY, {
+    expiresIn: "30d",
+  });
 
-    if(isMatched){
-        //generate token
+  return res.status(200).json({
+    message: "Login successfully",
+    token,
+  });
+};
 
-        const token=jwt.sign({id:userFound[0]._id},process.env.SECRET_KEY,{
-            expiresIn:'30d'
-        })
-
-
-
-        return res.status(200).json({
-            message:"Login successfully...",
-            token
-        })
-    }else{
-        res.status(400).json({
-            message:"invalid password"
-        })
-    }
-
-}
 
 
 
@@ -91,15 +90,16 @@ exports.userLogin= async(req,res)=>{
 
 
 exports.forgetPassword=async(req,res)=>{
-    const {email}=req.body
-    if(!email){
+    const {userEmail}=req.body
+   
+    if(!userEmail){
         return res.status(400).json({
             message:"Please provide an email"
         })
     }
 
     //check the user with  that email
-    const existUser= await User.find({userEmail:email})
+    const existUser= await User.find({userEmail:userEmail})
 
     if(existUser.length ==0){
         return res.status(404).json({
@@ -116,7 +116,7 @@ exports.forgetPassword=async(req,res)=>{
        await existUser[0].save()
 
     await sendEmail({
-        email:email,
+        email:userEmail,
         subject:"Otp for digitalFood forgetPassword",
         message:`Your otp is${otp}. Donot share with any one`
     })
@@ -130,8 +130,8 @@ exports.forgetPassword=async(req,res)=>{
 //Verify Otp
 
 exports.verifyOtp= async(req,res)=>{
-    const {email,otp}=req.body
-    if(!email || !otp){
+    const {userEmail,otp}=req.body
+    if(!userEmail || !otp){
         return res.status(400).json({
             message:"Please provide email,otp"
         })
@@ -139,7 +139,7 @@ exports.verifyOtp= async(req,res)=>{
 
     //check if that  otp is correct  or not fo that email
 
-    const userExists=await User.find({userEmail:email})
+    const userExists=await User.find({userEmail:userEmail})
     if(userExists.length ==0){
         return res.status(404).json({
             message:"Email is not registered"
@@ -165,8 +165,8 @@ exports.verifyOtp= async(req,res)=>{
 
 
 exports.resetPassword=async(req,res)=>{
-    const {email,newPassword,confirmPassword}=req.body;
-    if(!email || !newPassword || !confirmPassword){
+    const {userEmail,newPassword,confirmPassword}=req.body;
+    if(!userEmail || !newPassword || !confirmPassword){
         return res.status(400).json({
             message:"Please provide email, newPassword and confirmPassword"
         })
@@ -178,7 +178,7 @@ exports.resetPassword=async(req,res)=>{
         })
     }
 
-    const userExists=await User.find({userEmail:email})
+    const userExists=await User.find({userEmail:userEmail})
 
     if(userExists.length ==0){
         return res.status(400).json({

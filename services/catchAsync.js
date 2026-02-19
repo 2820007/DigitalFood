@@ -1,11 +1,13 @@
-module.exports=(fn)=>{
-    return (req,res,next)=>{
-        fn(req,res,next).catch((err)=>{
+module.exports = (fn) => {
+    return async (req, res, next) => {
+        try {
+            await fn(req, res, next);
+        } catch (err) {
+            console.error(err); // log full error
             return res.status(500).json({
-                message:err.message,
-                fullErr:err
-
-            })
-        })
-    }
-}
+                message: err.message,
+                fullErr: err
+            });
+        }
+    };
+};
