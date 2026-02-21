@@ -25,7 +25,7 @@ const productSchema=new Schema({
         default:"available"
     },
     productImage:String,
-    reviews:[reviewSchema]
+    // reviews:[reviewSchema]
 
 },
 {

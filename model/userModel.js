@@ -5,6 +5,8 @@ const userSchema = new Schema(
   {
     userEmail: {
       type: String,
+      unique:true,
+      lowercase:true,
       require: [true, "userEmail must be provided"],
     },
     userName: {
@@ -37,6 +39,11 @@ const userSchema = new Schema(
       default: false,
       
     },
+
+    cart:[{
+      type:Schema.Types.ObjectId,
+      ref:"Product"
+    }]
   },
   {
     timestamps: true,

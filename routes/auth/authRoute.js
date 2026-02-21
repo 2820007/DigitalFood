@@ -4,8 +4,8 @@ const {
   forgetPassword,
   verifyOtp,
   resetPassword,
-} = require("../controller/auth/authController");
-const catchAsync = require("../services/catchAsync");
+} = require("../../controller/auth/authController");
+const catchAsync = require("../../services/catchAsync");
 
 const router = require("express").Router();
 

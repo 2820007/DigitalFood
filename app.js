@@ -1,9 +1,11 @@
 const express=require("express")
 const { connectDb } = require("./database/database")
-const authRoute=require("./routes/authRoute")
-const productRoute=require("./routes/productRoute")
-const adminUserRoute=require("./routes/adminUserRoute")
-const reviewRoute=require("./routes/reviewRoute")
+const authRoute=require("./routes/auth/authRoute")
+const productRoute=require("./routes/admin/productRoute")
+const adminUserRoute=require("./routes/admin/adminUserRoute")
+const reviewRoute=require("./routes/user/reviewRoute")
+const profileRouter = require("./routes/user/profileRoute")
+const cartRouter = require("./routes/user/cartRoute")
 const app=express()
 
 require("dotenv").config()
@@ -26,6 +28,8 @@ app.use("/api",authRoute)
 app.use("/api",productRoute)
 app.use("/api",adminUserRoute)
 app.use("/api",reviewRoute)
+app.use("/api",profileRouter)
+app.use("/api",cartRouter)
 
 
 app.get("/",(req,res)=>{
