@@ -6,6 +6,8 @@ const adminUserRoute=require("./routes/admin/adminUserRoute")
 const reviewRoute=require("./routes/user/reviewRoute")
 const profileRouter = require("./routes/user/profileRoute")
 const cartRouter = require("./routes/user/cartRoute")
+const orderRouter = require("./routes/user/orderRoute")
+const adminOrderRoute = require("./routes/admin/adminOrderRoute")
 const app=express()
 
 require("dotenv").config()
@@ -30,6 +32,8 @@ app.use("/api",adminUserRoute)
 app.use("/api",reviewRoute)
 app.use("/api",profileRouter)
 app.use("/api",cartRouter)
+app.use("/api",orderRouter)
+app.use("/api",adminOrderRoute)
 
 
 app.get("/",(req,res)=>{

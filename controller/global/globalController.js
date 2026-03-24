@@ -11,7 +11,7 @@ exports.getProducts = async (req, res) => {
     });
   }
   res.status(200).json({
-    message: ":Projects fetched successfully...",
+    message: ":Products fetched successfully...",
     data:products,
   });
 };

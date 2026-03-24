@@ -9,25 +9,23 @@ const isAuthenticated= async(req,res,next)=>{
         })
     }
 
+    
+
+
+
+
 
 
    try {
      const decoded=await promisify(jwt.verify)(token,process.env.SECRET_KEY)
 
-
-    
-
-
     //check if decode.id exist in the user table
-
 
    const doesUsertExists= await  User.findOne({_id:decoded.id})
    if(!doesUsertExists){
     return res.status(404).json({
         message:"User doesn't exist with that token/id"
     })
-
-
 
    
    }

@@ -69,7 +69,7 @@ exports.userLogin = async (req, res) => {
 
   if (!isMatched) {
     return res.status(400).json({
-      message: "Invalid password",
+      message: "Credential not matched....",
     });
   }
 
